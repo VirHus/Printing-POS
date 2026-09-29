@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Sale;
+
+class SaleController extends Controller
+{
+    public function index()
+    {
+        $sales = Sale::with(['items.product', 'user'])
+            ->latest()
+            ->paginate(20);
+
+        return view('sales.index', compact('sales'));
+    }
+
+    public function show(Sale $sale)
+    {
+        $sale->load(['items.product', 'user']);
+
+        return view('sales.show', compact('sale'));
+    }
+}
