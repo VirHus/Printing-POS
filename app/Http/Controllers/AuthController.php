@@ -9,8 +9,13 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
+        if (Auth::check()) {
+            return redirect()->route('dashboard');
+        }
+
         return view('auth.login');
     }
+
 
     public function login(Request $request)
     {
@@ -19,21 +24,54 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials)) {
 
-            $request->session()->regenerate();
+        if (!Auth::attempt($credentials)) {
 
-            return redirect()->intended(
-                route('dashboard')
-            );
+            return back()
+                ->withErrors([
+                    'email' => 'The email or password is incorrect.',
+                ])
+                ->withInput(
+                    $request->only('email')
+                );
         }
 
-        return back()
-            ->withErrors([
-                'email' => 'The email or password is incorrect.',
-            ])
-            ->withInput($request->only('email'));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Check Account Status
+        |--------------------------------------------------------------------------
+        */
+
+        if (!auth()->user()->is_active) {
+
+            Auth::logout();
+
+            return back()
+                ->withErrors([
+                    'email' =>
+                        'Your account has been deactivated. Please contact an administrator.',
+                ])
+                ->withInput(
+                    $request->only('email')
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Regenerate Session
+        |--------------------------------------------------------------------------
+        */
+
+        $request->session()->regenerate();
+
+
+        return redirect()->intended(
+            route('dashboard')
+        );
     }
+
 
     public function logout(Request $request)
     {

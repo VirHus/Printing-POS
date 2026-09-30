@@ -1,361 +1,271 @@
-<!DOCTYPE html>
-<html>
-<head>
+@extends('layouts.app')
 
-    <title>Dashboard - Printing POS</title>
+@section('title', 'Dashboard | Printing POS')
 
-    <style>
+@section('page-title', 'Dashboard')
 
-        * {
-            box-sizing: border-box;
-        }
+@section('content')
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            color: #333;
-        }
+<div style="margin-bottom:25px;">
 
-        .navbar {
-            background: #1f2937;
-            color: white;
-            padding: 15px 25px;
+    <h2 style="font-size:18px;">
+        Welcome, {{ auth()->user()->name }}!
+    </h2>
 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    <p style="color:#6b7280;font-size:13px;margin-top:5px;">
+        Here's what's happening with your printing business today.
+    </p>
 
-        .navbar h2 {
-            margin: 0;
-        }
+</div>
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 20px;
-        }
 
-        .nav-links a:hover {
-            text-decoration: underline;
-        }
+<div class="stats-grid">
 
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+    <div class="stat-card">
 
-        .welcome {
-            margin-bottom: 25px;
-        }
+        <div>
+            <div class="stat-label">
+                Today's Sales
+            </div>
 
-        .welcome h1 {
-            margin-bottom: 5px;
-        }
+            <div class="stat-value">
+                ₱{{ number_format($todaySales, 2) }}
+            </div>
+        </div>
 
-        .welcome p {
-            color: #666;
-        }
+        <div class="stat-icon">
+            ₱
+        </div>
 
-        .cards {
-            display: grid;
-            grid-template-columns:
-                repeat(3, 1fr);
+    </div>
 
-            gap: 20px;
-            margin-bottom: 30px;
-        }
 
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
+    <div class="stat-card">
 
-            box-shadow:
-                0 2px 8px rgba(0, 0, 0, .08);
-        }
+        <div>
+            <div class="stat-label">
+                Transactions
+            </div>
 
-        .card-title {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
+            <div class="stat-value">
+                {{ $todayTransactions }}
+            </div>
+        </div>
 
-        .card-value {
-            font-size: 30px;
-            font-weight: bold;
-        }
+        <div class="stat-icon">
+            ▤
+        </div>
 
-        .sales-card {
-            color: #16a34a;
-        }
+    </div>
 
-        .transaction-card {
-            color: #2563eb;
-        }
 
-        .service-card {
-            color: #9333ea;
-        }
+    <div class="stat-card">
 
-        .section {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
+        <div>
+            <div class="stat-label">
+                Active Services
+            </div>
 
-            box-shadow:
-                0 2px 8px rgba(0, 0, 0, .08);
-        }
+            <div class="stat-value">
+                {{ $activeServices }}
+            </div>
+        </div>
 
-        .section h2 {
-            margin-top: 0;
-        }
+        <div class="stat-icon">
+            ◫
+        </div>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    </div>
 
-        th,
-        td {
-            padding: 13px;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
-        }
 
-        th {
-            background: #f1f3f5;
-        }
+    <div class="stat-card">
 
-        .btn {
-            display: inline-block;
+        <div>
+            <div class="stat-label">
+                Your Role
+            </div>
 
-            padding: 8px 13px;
+            <div class="stat-value"
+                 style="font-size:18px;">
+                {{ auth()->user()->role }}
+            </div>
+        </div>
 
-            background: #2563eb;
-            color: white;
-
-            text-decoration: none;
-
-            border-radius: 6px;
-        }
-
-        .btn:hover {
-            background: #1d4ed8;
-        }
-
-        .quick-actions {
-            margin-top: 25px;
-
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .empty {
-            text-align: center;
-            color: #777;
-            padding: 20px;
-        }
-
-        @media (max-width: 800px) {
-
-            .cards {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .nav-links a {
-                margin-left: 0;
-                margin-right: 15px;
-            }
-
-            table {
-                font-size: 13px;
-            }
-
-        }
-
-    </style>
-
-</head>
-
-<body>
-
-<div class="navbar">
-
-    <h2>Printing POS</h2>
-
-    <div class="nav-links">
-
-        <a href="{{ route('dashboard') }}">
-            Dashboard
-        </a>
-
-        <a href="{{ route('pos.index') }}">
-            POS
-        </a>
-
-        <a href="{{ route('products.index') }}">
-            Services
-        </a>
-
-        <a href="{{ route('sales.index') }}">
-            Sales History
-        </a>
+        <div class="stat-icon">
+            ♙
+        </div>
 
     </div>
 
 </div>
 
 
-<div class="container">
+<div class="card" style="margin-bottom:25px;">
 
-    <div class="welcome">
+    <div class="card-header">
 
-        <h1>Dashboard</h1>
+        <div>
+            <h2>Quick Actions</h2>
 
-        <p>
-            Welcome to the Printing Services Point of Sale System.
-        </p>
-
-    </div>
-
-
-    <!-- SUMMARY CARDS -->
-
-    <div class="cards">
-
-        <div class="card">
-
-            <div class="card-title">
-                Today's Sales
-            </div>
-
-            <div class="card-value sales-card">
-
-                ₱{{ number_format($todaySales, 2) }}
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-title">
-                Today's Transactions
-            </div>
-
-            <div class="card-value transaction-card">
-
-                {{ $todayTransactions }}
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-title">
-                Active Services
-            </div>
-
-            <div class="card-value service-card">
-
-                {{ $activeServices }}
-
-            </div>
-
+            <p>
+                Quickly access frequently used functions.
+            </p>
         </div>
 
     </div>
 
 
-    <!-- RECENT TRANSACTIONS -->
+    <div class="quick-grid">
 
-    <div class="section">
+        <a
+            href="{{ route('pos.index') }}"
+            class="quick-action"
+        >
 
-        <h2>
-            Recent Transactions
-        </h2>
+            <div class="quick-action-icon">
+                🛒
+            </div>
+
+            <strong>New Sale</strong>
+
+            <span>
+                Start a new transaction
+            </span>
+
+        </a>
+
+
+        <a
+            href="{{ route('sales.index') }}"
+            class="quick-action"
+        >
+
+            <div class="quick-action-icon">
+                🧾
+            </div>
+
+            <strong>Transactions</strong>
+
+            <span>
+                View sales history
+            </span>
+
+        </a>
+
+
+        @if(auth()->user()->role === 'Administrator')
+
+            <a
+                href="{{ route('products.index') }}"
+                class="quick-action"
+            >
+
+                <div class="quick-action-icon">
+                    ⚙️
+                </div>
+
+                <strong>Services</strong>
+
+                <span>
+                    Manage prices and services
+                </span>
+
+            </a>
+
+
+            <a
+                href="{{ route('reports.index') }}"
+                class="quick-action"
+            >
+
+                <div class="quick-action-icon">
+                    📊
+                </div>
+
+                <strong>Reports</strong>
+
+                <span>
+                    View business reports
+                </span>
+
+            </a>
+
+        @endif
+
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="card-header">
+
+        <div>
+            <h2>Recent Transactions</h2>
+
+            <p>
+                Latest sales recorded in the system.
+            </p>
+        </div>
+
+        <a
+            href="{{ route('sales.index') }}"
+            class="btn btn-secondary"
+        >
+            View All
+        </a>
+
+    </div>
+
+
+    <div class="table-wrapper">
 
         <table>
 
             <thead>
 
                 <tr>
-
-                    <th>
-                        Transaction #
-                    </th>
-
-                    <th>
-                        Date
-                    </th>
-
-                    <th>
-                        Total
-                    </th>
-
-                    <th>
-                        Action
-                    </th>
-
+                    <th>Transaction</th>
+                    <th>Date</th>
+                    <th>Cashier</th>
+                    <th>Total</th>
+                    <th>Action</th>
                 </tr>
 
             </thead>
 
             <tbody>
 
-                @forelse ($recentSales as $sale)
+                @forelse($recentSales as $sale)
 
                     <tr>
 
                         <td>
-
-                            SALE-{{ str_pad(
-                                $sale->id,
-                                6,
-                                '0',
-                                STR_PAD_LEFT
-                            ) }}
-
+                            <strong>
+                                SALE-{{ str_pad($sale->id, 6, '0', STR_PAD_LEFT) }}
+                            </strong>
                         </td>
 
                         <td>
-
-                            {{ $sale->created_at->format(
-                                'M d, Y h:i A'
-                            ) }}
-
+                            {{ $sale->created_at->format('M d, Y h:i A') }}
                         </td>
 
                         <td>
+                            {{ $sale->user->name ?? 'Cashier' }}
+                        </td>
 
-                            ₱{{ number_format(
-                                $sale->total_amount,
-                                2
-                            ) }}
-
+                        <td>
+                            <strong>
+                                ₱{{ number_format($sale->total_amount, 2) }}
+                            </strong>
                         </td>
 
                         <td>
 
                             <a
-                                href="{{ route(
-                                    'sales.show',
-                                    $sale
-                                ) }}"
-                                class="btn"
+                                href="{{ route('sales.show', $sale) }}"
+                                class="btn btn-secondary"
                             >
                                 View
                             </a>
@@ -369,10 +279,15 @@
                     <tr>
 
                         <td
-                            colspan="4"
-                            class="empty"
+                            colspan="5"
+                            style="
+                                text-align:center;
+                                padding:35px;
+                                color:#9ca3af;
+                            "
                         >
                             No transactions yet.
+
                         </td>
 
                     </tr>
@@ -383,37 +298,8 @@
 
         </table>
 
-
-        <!-- QUICK ACTIONS -->
-
-        <div class="quick-actions">
-
-            <a
-                href="{{ route('pos.index') }}"
-                class="btn"
-            >
-                + New Sale
-            </a>
-
-            <a
-                href="{{ route('products.index') }}"
-                class="btn"
-            >
-                Manage Services
-            </a>
-
-            <a
-                href="{{ route('sales.index') }}"
-                class="btn"
-            >
-                View All Sales
-            </a>
-
-        </div>
-
     </div>
 
 </div>
 
-</body>
-</html>
+@endsection

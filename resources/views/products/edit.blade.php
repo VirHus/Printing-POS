@@ -1,5 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layouts.app')
+
+@section('title', 'Services | Printing POS')
+
+@section('page-title', 'Services')
+
+@section('content')
+
+<!-- your existing Products page content here -->
+
+@endsection
 
 <head>
 
