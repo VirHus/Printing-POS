@@ -9,16 +9,16 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $todaySales = Sale::whereDate('created_at', today())
+        $todaySales = Sale::visibleTo(auth()->user())->whereDate('created_at', today())
             ->sum('total_amount');
 
-        $todayTransactions = Sale::whereDate('created_at', today())
+        $todayTransactions = Sale::visibleTo(auth()->user())->whereDate('created_at', today())
             ->count();
 
         $activeServices = Product::where('is_active', true)
             ->count();
 
-        $recentSales = Sale::with(['items.product', 'user'])
+        $recentSales = Sale::visibleTo(auth()->user())->with(['items.product', 'user', 'store'])
             ->latest()
             ->take(10)
             ->get();

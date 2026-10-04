@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
-use Illuminate\Http\Request;
+use App\Models\Store;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -21,7 +22,6 @@ class ReportController extends Controller
             now()->format('Y-m-d')
         );
 
-
         /*
         |--------------------------------------------------------------------------
         | Validate Dates
@@ -31,8 +31,10 @@ class ReportController extends Controller
         $request->validate([
             'from' => 'nullable|date',
             'to' => 'nullable|date|after_or_equal:from',
+            'store_id' => 'nullable|integer|exists:stores,id',
         ]);
 
+        $stores = $request->user()->isAdministrator() ? Store::orderBy('name')->get() : collect();
 
         $fromDate = Carbon::parse($from)
             ->startOfDay();
@@ -40,24 +42,23 @@ class ReportController extends Controller
         $toDate = Carbon::parse($to)
             ->endOfDay();
 
-
         /*
         |--------------------------------------------------------------------------
         | Sales
         |--------------------------------------------------------------------------
         */
 
-        $sales = Sale::with([
+        $sales = Sale::visibleTo($request->user(), $request->integer('store_id'))->with([
             'user',
-            'items.product'
+            'items.product',
+            'store',
         ])
-        ->whereBetween(
-            'created_at',
-            [$fromDate, $toDate]
-        )
-        ->latest()
-        ->get();
-
+            ->whereBetween(
+                'created_at',
+                [$fromDate, $toDate]
+            )
+            ->latest()
+            ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -79,7 +80,6 @@ class ReportController extends Controller
 
         });
 
-
         /*
         |--------------------------------------------------------------------------
         | Sales By Service
@@ -88,38 +88,40 @@ class ReportController extends Controller
 
         $serviceSales = SaleItem::with([
             'product',
-            'sale'
+            'sale',
         ])
-        ->whereHas('sale', function ($query) use (
-            $fromDate,
-            $toDate
-        ) {
+            ->whereHas('sale', function ($query) use (
+                $fromDate,
+                $toDate,
+                $request
+            ) {
 
-            $query->whereBetween(
-                'created_at',
-                [$fromDate, $toDate]
-            );
+                $query->visibleTo($request->user(), $request->integer('store_id'));
 
-        })
-        ->get()
-        ->groupBy(function ($item) {
+                $query->whereBetween(
+                    'created_at',
+                    [$fromDate, $toDate]
+                );
 
-            return $item->product->name;
+            })
+            ->get()
+            ->groupBy(function ($item) {
 
-        })
-        ->map(function ($items) {
+                return $item->product->name;
 
-            return [
-                'quantity' => $items->sum('quantity'),
+            })
+            ->map(function ($items) {
 
-                'revenue' => $items->sum(
-                    'subtotal'
-                ),
-            ];
+                return [
+                    'quantity' => $items->sum('quantity'),
 
-        })
-        ->sortByDesc('revenue');
+                    'revenue' => $items->sum(
+                        'subtotal'
+                    ),
+                ];
 
+            })
+            ->sortByDesc('revenue');
 
         /*
         |--------------------------------------------------------------------------
@@ -147,7 +149,6 @@ class ReportController extends Controller
             })
             ->sortByDesc('revenue');
 
-
         return view(
             'reports.index',
             compact(
@@ -158,7 +159,8 @@ class ReportController extends Controller
                 'totalItems',
                 'serviceSales',
                 'cashierSales',
-                'sales'
+                'sales',
+                'stores'
             )
         );
     }

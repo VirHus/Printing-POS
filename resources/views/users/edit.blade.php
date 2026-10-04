@@ -1,14 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Services | Printing POS')
+@section('title', 'Edit User | Printing POS')
 
-@section('page-title', 'Services')
+@section('page-title', 'Users')
 
 @section('content')
 
-<!-- your existing Products page content here -->
-
-@endsection
+<!-- User editing form -->
 <head>
 
     <title>Edit User - Printing POS</title>
@@ -17,7 +15,7 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
             background: #f4f6f9;
         }
 
@@ -84,6 +82,19 @@
             font-size: 13px;
         }
 
+        body { background: #07111f; color: #dce7f1; }
+        .container { width: 100%; max-width: 680px; margin: 0 auto; padding: 0; }
+        .card { padding: clamp(20px, 4vw, 32px); background: #0c1828; border: 1px solid #2a4055; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,.16); }
+        .card h1 { margin: 0 0 24px; font-size: 20px; letter-spacing: -.02em; }
+        .form-group { margin-bottom: 20px; }
+        input, select { padding: 12px 13px; border-radius: 8px; }
+        .actions { flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+        .btn { min-height: 40px; padding: 10px 16px; border-radius: 8px; font-weight: 600; }
+        h1, label { color: #f8fafc; }
+        input, select { background: #101d2e; border-color: #34465c; color: #f8fafc; }
+        .note { color: #8298ad; }
+        .btn { background: #078b89; } .btn-gray { background: #202f44; color: #dce7f1; }
+        .errors { background: rgba(244,63,94,.12); color: #fda4af; }
     </style>
 
 </head>
@@ -166,6 +177,7 @@
                 <label>Role</label>
 
                 <select name="role" required>
+                    @if(auth()->user()->isSuperadmin())<option value="Superadmin" @selected(old('role', $user->role) === 'Superadmin')>Superadmin</option>@endif
 
                     <option
                         value="Cashier"
@@ -188,6 +200,14 @@
             </div>
 
 
+            <div class="form-group">
+                <label for="store_id">Assigned store</label>
+                <select id="store_id" name="store_id" required>
+                    @foreach($stores as $store)
+                        <option value="{{ $store->id }}" @selected(old('store_id', $user->store_id) == $store->id)>{{ $store->name }}{{ $store->is_active ? '' : ' (Inactive)' }}</option>
+                    @endforeach
+                </select>
+            </div>
             <hr>
 
             <p class="note">
@@ -246,3 +266,4 @@
 
 </body>
 </html>
+@endsection

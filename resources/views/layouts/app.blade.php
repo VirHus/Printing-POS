@@ -5,18 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>
-        @yield('title', 'Printing POS')
+        @yield('page-title', 'Dashboard') | {{ $branding['system_name'] }}
     </title>
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if($branding['favicon_path'])<link rel="icon" type="image/png" href="{{ asset('storage/'.$branding['favicon_path']) }}">@endif
+
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
         }
 
         body {
-            font-family: Inter, Arial, Helvetica, sans-serif;
+            font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
             background: #f5f7fb;
             color: #1f2937;
         }
@@ -28,9 +35,13 @@
 
         button,
         input,
-        select {
+        select,
+        textarea {
             font-family: inherit;
         }
+
+        button, a { -webkit-tap-highlight-color: transparent; }
+        button:focus-visible, a:focus-visible { outline: 2px solid #2dd4bf; outline-offset: 3px; }
 
         /* =========================
            APP
@@ -423,7 +434,7 @@
         }
 
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
 
         .form-group.full {
@@ -460,8 +471,9 @@
 
         .form-actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 24px;
         }
 
         /* =========================
@@ -537,6 +549,10 @@
             cursor: pointer;
         }
 
+        .sidebar-backdrop {
+            display: none;
+        }
+
         @media (max-width: 1000px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -551,10 +567,30 @@
             .sidebar {
                 transform: translateX(-100%);
                 transition: .25s;
+                width: min(285px, 86vw);
+                box-shadow: 18px 0 45px rgba(0,0,0,.35);
             }
 
             .sidebar.open {
                 transform: translateX(0);
+            }
+
+            .sidebar-backdrop {
+                position: fixed;
+                inset: 0;
+                z-index: 900;
+                display: block;
+                border: 0;
+                background: rgba(2,8,18,.68);
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity .25s ease;
+                backdrop-filter: blur(2px);
+            }
+
+            .sidebar-backdrop.open {
+                opacity: 1;
+                pointer-events: auto;
             }
 
             .main {
@@ -580,12 +616,82 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Unified dark application theme */
+        body { background: #07111f; color: #dce7f1; }
+        .sidebar { background: #172437; border-right: 1px solid #29394e; box-shadow: 8px 0 30px rgba(0,0,0,.12); }
+        .brand { border-color: #29394e; }
+        .brand-icon, .avatar { background: linear-gradient(135deg, #0aa39c, #087875); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+        .brand-icon svg { width: 21px; height: 21px; }
+        .brand-text h2 { letter-spacing: -.02em; }
+        .brand-text span, .menu-title, .page-title p { color: #8298ad; }
+        .menu a { color: #b8c6d5; font-weight: 500; letter-spacing: -.01em; border: 1px solid transparent; }
+        .menu a:hover { background: rgba(8,139,137,.18); border-color: rgba(20,184,166,.18); color: #fff; transform: translateX(2px); }
+        .menu a.active { background: linear-gradient(135deg, #078b89, #087875); border-color: rgba(94,234,212,.18); color: #fff; box-shadow: 0 7px 18px rgba(3,105,101,.18); }
+        .menu-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 20px; }
+        .menu-icon svg { width: 18px; height: 18px; stroke-width: 1.8; }
+        .sidebar-footer { border-color: #29394e; }
+        .logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: #202f44; color: #cad5df; font-weight: 600; transition: .2s ease; }
+        .logout-btn svg { width: 16px; height: 16px; }
+        .main { background: #07111f; }
+        .topbar { height: 68px; background: rgba(23,36,55,.96); border-color: #29394e; padding-inline: 24px; backdrop-filter: blur(16px); }
+        .page-title h1 { color: #f4f8fb; font-size: 19px; font-weight: 700; letter-spacing: -.025em; line-height: 1.25; }
+        .page-title p { font-size: 11px; letter-spacing: .01em; }
+        .content { width: 100%; max-width: 1720px; margin-inline: auto; padding: 20px 24px 28px; }
+        .content > * { margin-top: 0 !important; }
+        .content > * + * { margin-top: 20px !important; }
+        .content .navbar { display: none; }
+        .card, .stat-card { background: #0c1828; border-color: #2a4055; box-shadow: 0 12px 35px rgba(0,0,0,.14); }
+        .card { padding: clamp(18px, 2vw, 24px); }
+        .stat-card { min-height: 112px; padding: 20px; }
+        .stats-grid { gap: 16px; margin-bottom: 0; }
+        .card-header { gap: 16px; margin-bottom: 20px; }
+        .card-header h2, .stat-value { color: #f4f8fb; }
+        .card-header p, .stat-label { color: #8298ad; }
+        .stat-icon { background: rgba(20,184,166,.12); color: #5eead4; }
+        .btn-primary { background: #078b89; }
+        .btn-primary:hover { background: #0a9f9b; }
+        .btn-secondary { background: #202f44; color: #dce7f1; border: 1px solid #34465c; }
+        .btn-danger { background: rgba(244,63,94,.14); color: #fda4af; }
+        .btn-success { background: rgba(16,185,129,.14); color: #6ee7b7; }
+        th { background: #111e30; color: #8298ad; font-size: 10px; font-weight: 700; letter-spacing: .075em; }
+        td { border-color: #223247; color: #c9d5e2; line-height: 1.45; }
+        tr:hover td { background: rgba(30,47,68,.5); }
+        label { color: #cbd7e3; }
+        input, select, textarea { background: #101d2e; border-color: #34465c; color: #f1f5f9; transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease; }
+        input::placeholder, textarea::placeholder { color: #64778b; }
+        input:focus, select:focus, textarea:focus { border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,.15); }
+        .quick-action { background: #101d2e; border-color: #2a4055; }
+        .quick-action:hover { border-color: #14b8a6; }
+        .quick-action strong { color: #f4f8fb; }
+        .quick-action span { color: #8298ad; }
+        .alert-success { background: rgba(16,185,129,.12); color: #6ee7b7; border-color: rgba(16,185,129,.35); }
+        .alert-error { background: rgba(244,63,94,.12); color: #fda4af; border-color: rgba(244,63,94,.35); }
+        .desktop-user { font-size: 13px; color: #dce7f1; }
+        .top-user .avatar { border: 2px solid rgba(94,234,212,.18); }
+        ::selection { background: rgba(20,184,166,.35); color: #fff; }
+
+        @media (min-width: 751px) {
+            .desktop-user { display: block !important; }
+        }
+
+        @media (max-width: 750px) {
+            .content { padding: 14px 12px 22px; }
+            .topbar { padding-inline: 14px; }
+            .page-title h1 { font-size: 17px; }
+            .page-title p { display: none; }
+            .content > * + * { margin-top: 14px !important; }
+            .card, .stat-card { padding: 16px; border-radius: 12px; }
+            .card-header { align-items: flex-start; flex-direction: column; margin-bottom: 16px; }
+            th, td { padding: 12px 14px; }
+        }
     </style>
 
     @stack('styles')
+    @include('settings._theme', ['branding' => $branding])
 </head>
 
-<body>
+<body class="glass-theme">
 
 <div class="app">
 
@@ -593,62 +699,51 @@
 
         <div class="brand">
             <div class="brand-icon">
-                🖨️
+                @if($branding['logo_path'])
+                    <img src="{{ asset('storage/'.$branding['logo_path']) }}" alt="{{ $branding['system_name'] }} logo">
+                @else
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6v-8Z" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                @endif
             </div>
 
             <div class="brand-text">
-                <h2>Printing POS</h2>
-                <span>Management System</span>
+                <h2 title="{{ $branding['system_name'] }}">{{ $branding['system_name'] }}</h2>
+                <span>{{ $branding['tagline'] }}</span>
             </div>
         </div>
 
         <nav class="menu">
-
-            <div class="menu-title">Main</div>
-
-            <a href="{{ route('dashboard') }}"
-               class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <span class="menu-icon">▣</span>
-                Dashboard
-            </a>
-
-            <a href="{{ route('pos.index') }}"
-               class="{{ request()->routeIs('pos.*') ? 'active' : '' }}">
-                <span class="menu-icon">🛒</span>
-                Point of Sale
-            </a>
-
-            <a href="{{ route('sales.index') }}"
-               class="{{ request()->routeIs('sales.*') ? 'active' : '' }}">
-                <span class="menu-icon">▤</span>
-                Transactions
-            </a>
-
-            @if(auth()->user()->role === 'Administrator')
-
-                <div class="menu-title">Management</div>
-
-                <a href="{{ route('products.index') }}"
-                   class="{{ request()->routeIs('products.*') ? 'active' : '' }}">
-                    <span class="menu-icon">◫</span>
-                    Services
-                </a>
-
-                <a href="{{ route('users.index') }}"
-                   class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
-                    <span class="menu-icon">♙</span>
-                    Users
-                </a>
-
-                <a href="{{ route('reports.index') }}"
-                   class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">
-                    <span class="menu-icon">▥</span>
-                    Reports
-                </a>
-
+            @if(! auth()->user()->isSuperadmin())
+                @php($currentSection = null)
+                @foreach($sidebarItems as $item)
+                    @if($item['section'] !== $currentSection)
+                        @if($item['section'] !== '')
+                            <div class="menu-title">{{ $item['section'] }}</div>
+                        @endif
+                        @php($currentSection = $item['section'])
+                    @endif
+                    <a href="{{ $item['destination'] === 'external' ? $item['url'] : route($item['destination']) }}"
+                       class="{{ $item['destination'] !== 'external' && request()->routeIs($item['destination'] === 'dashboard' ? 'dashboard' : str_replace('.index', '.*', $item['destination'])) ? 'active' : '' }}"
+                       @if($item['destination'] === 'external') target="_blank" rel="noopener noreferrer" @endif>
+                        <span class="menu-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ \App\Models\SystemSetting::SIDEBAR_ICONS[$item['icon']] }}"/></svg></span>
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            @else
+                <div class="menu-title">Customization</div>
+                <a href="{{ route('settings.edit') }}" class="{{ request()->routeIs('settings.edit') ? 'active' : '' }}">System Settings</a>
+                <a href="{{ route('settings.sidebar.edit') }}" class="{{ request()->routeIs('settings.sidebar.*') ? 'active' : '' }}">Sidebar Editor</a>
+                <a href="{{ route('stores.index') }}" class="{{ request()->routeIs('stores.*') ? 'active' : '' }}">Store Branding</a>
+                <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">Accounts</a>
             @endif
-
+            @if(! auth()->user()->isSuperadmin() && auth()->user()->isAdministrator() && $needsSuperadminSetup)
+                <div class="menu-title">System</div>
+                <a href="{{ route('superadmin.setup') }}" class="{{ request()->routeIs('superadmin.*') ? 'active' : '' }}"><span class="menu-icon">+</span>Superadmin Setup</a>
+            @endif
         </nav>
+        @if(! auth()->user()->isSuperadmin())
+            <div class="px-4 pb-4 text-xs text-slate-400">Assigned store: {{ auth()->user()->store?->name ?? 'Not assigned' }}</div>
+        @endif
 
         <div class="sidebar-footer">
 
@@ -669,13 +764,16 @@
                 @csrf
 
                 <button type="submit" class="logout-btn">
-                    ⇥ &nbsp; Logout
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Logout
                 </button>
             </form>
 
         </div>
 
     </aside>
+
+    <button type="button" class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar(false)" aria-label="Close navigation"></button>
 
     <main class="main">
 
@@ -684,8 +782,9 @@
             <div style="display:flex;align-items:center;gap:15px;">
 
                 <button class="mobile-menu"
-                        onclick="toggleSidebar()">
-                    ☰
+                        onclick="toggleSidebar()"
+                        aria-label="Toggle navigation">
+                    <svg style="width:22px;height:22px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke-width="2" stroke-linecap="round"/></svg>
                 </button>
 
                 <div class="page-title">
@@ -695,7 +794,7 @@
                     </h1>
 
                     <p>
-                        Printing Services Point of Sale
+                        {{ auth()->user()->isSuperadmin() ? 'Superadmin customization panel' : $branding['header_text'] }}
                     </p>
 
                 </div>
@@ -745,11 +844,35 @@
 </div>
 
 <script>
-function toggleSidebar() {
-    document
-        .getElementById('sidebar')
-        .classList.toggle('open');
+function toggleSidebar(forceOpen = null) {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const shouldOpen = forceOpen ?? !sidebar.classList.contains('open');
+
+    sidebar.classList.toggle('open', shouldOpen);
+    backdrop.classList.toggle('open', shouldOpen);
+    document.body.style.overflow = shouldOpen ? 'hidden' : '';
 }
+
+document.querySelectorAll('#sidebar a').forEach((link) => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 750) {
+            toggleSidebar(false);
+        }
+    });
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        toggleSidebar(false);
+    }
+});
+
+window.addEventListener('resize', () => {
+    if (window.innerWidth > 750) {
+        toggleSidebar(false);
+    }
+});
 </script>
 
 @stack('scripts')

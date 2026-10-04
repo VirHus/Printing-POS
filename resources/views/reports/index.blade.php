@@ -29,6 +29,11 @@
 
 
     <form method="GET" action="{{ route('reports.index') }}">
+        @if(auth()->user()->isAdministrator())
+            <div class="form-group"><label for="reportStore">Store</label><select id="reportStore" name="store_id"><option value="">All stores</option>@foreach($stores as $store)<option value="{{ $store->id }}" @selected(request('store_id') == $store->id)>{{ $store->name }}</option>@endforeach</select></div>
+        @else
+            <p class="mb-4 text-sm text-slate-400">{{ auth()->user()->store?->name ?? 'No store assigned' }}</p>
+        @endif
 
         <div
             style="
@@ -370,6 +375,7 @@
             <thead>
 
                 <tr>
+                    <th>Store</th>
                     <th>Transaction</th>
                     <th>Date</th>
                     <th>Cashier</th>
@@ -385,6 +391,7 @@
 
                     <tr>
 
+                        <td>{{ $sale->store?->name }}</td>
                         <td>
                             SALE-{{ str_pad(
                                 $sale->id,
@@ -426,7 +433,7 @@
                     <tr>
 
                         <td
-                            colspan="5"
+                            colspan="6"
                             style="
                                 text-align:center;
                                 padding:35px;

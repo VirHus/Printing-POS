@@ -1,14 +1,12 @@
 @extends('layouts.app')
 
-@section('title', 'Services | Printing POS')
+@section('title', 'Users | Printing POS')
 
-@section('page-title', 'Services')
+@section('page-title', 'Users')
 
 @section('content')
 
-<!-- your existing Products page content here -->
-
-@endsection
+<!-- User management -->
 <head>
 
     <title>User Management - Printing POS</title>
@@ -21,7 +19,7 @@
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
             background: #f4f6f9;
         }
 
@@ -151,12 +149,28 @@
             color: #991b1b;
         }
 
+        body { background: #07111f; color: #dce7f1; }
+        .navbar { background: #172437; border-bottom: 1px solid #29394e; }
+        .nav-links a { color: #b8c6d5; }
+        .container { width: 100%; max-width: none; margin: 0; padding: 0; }
+        .card { padding: clamp(18px, 3vw, 26px); background: #0c1828; border: 1px solid #2a4055; border-radius: 16px; box-shadow: 0 12px 35px rgba(0,0,0,.16); overflow-x: auto; }
+        .header { gap: 16px; margin-bottom: 22px; }
+        .header h1 { font-size: 20px; letter-spacing: -.02em; }
+        .btn { min-height: 36px; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+        th, td { padding: 14px 16px; white-space: nowrap; }
+        .actions { gap: 8px; }
+        h1 { color: #f8fafc; }
+        th { background: #111e30; color: #8298ad; } td, th { border-color: #223247; } td { color: #cbd5e1; }
+        .btn { background: #078b89; } .btn-gray { background: #202f44; color: #dce7f1; } .btn-red { background: rgba(244,63,94,.15); color: #fda4af; }
+        .success { background: rgba(16,185,129,.12); color: #6ee7b7; } .error { background: rgba(244,63,94,.12); color: #fda4af; }
+        @media (max-width: 640px) { .header { align-items: stretch; flex-direction: column; } .header .btn { text-align: center; } }
     </style>
 
 </head>
 
 <body>
 
+@if(! auth()->user()->isSuperadmin())
 <div class="navbar">
 
     <h2>Printing POS</h2>
@@ -186,8 +200,7 @@
     </div>
 
 </div>
-
-
+@endif
 <div class="container">
 
     <div class="card">
@@ -248,6 +261,7 @@
 
                         <td>
                             {{ $user->name }}
+                            <span class="mt-1 block text-xs text-slate-400">{{ $user->store?->name ?? 'No store assigned' }}</span>
                         </td>
 
                         <td>
@@ -369,3 +383,4 @@
 
 </body>
 </html>
+@endsection

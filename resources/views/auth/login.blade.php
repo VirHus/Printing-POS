@@ -9,7 +9,10 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Login | Printing POS</title>
+    <title>Login | {{ $branding['system_name'] }}</title>
+    @if($branding['favicon_path'])<link rel="icon" type="image/png" href="{{ asset('storage/'.$branding['favicon_path']) }}">@endif
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
 
@@ -21,7 +24,8 @@
 
         body {
             min-height: 100vh;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+            -webkit-font-smoothing: antialiased;
             background:
                 linear-gradient(
                     135deg,
@@ -194,26 +198,43 @@
 
         }
 
+        body { padding: clamp(12px, 3vw, 28px); background: radial-gradient(circle at 15% 15%, #123a43 0, #07111f 38%, #050c16 100%); color: #e5edf5; }
+        .login-container { max-width: 980px; min-height: 580px; background: #0c1828; border: 1px solid #2a4055; box-shadow: 0 28px 80px rgba(0,0,0,.4); }
+        .login-brand { padding: clamp(36px, 5vw, 58px); background: linear-gradient(145deg, #172b3d, #0b1b2b); }
+        .login-form { padding: clamp(30px, 5vw, 58px); }
+        .logo { background: linear-gradient(135deg, #14b8a6, #087875); }
+        .feature span:first-child { color: #5eead4; }
+        .login-form h2 { color: #f8fafc; }
+        .login-form .subtitle, .footer { color: #8298ad; }
+        label { color: #cbd5e1; }
+        input { background: #101d2e; border-color: #34465c; color: #f8fafc; }
+        input::placeholder { color: #64748b; }
+        input:focus { border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20,184,166,.14); }
+        .login-button { background: #078b89; }
+        .login-button:hover { background: #0a9f9b; }
+        .error { background: rgba(244,63,94,.12); border-color: rgba(244,63,94,.35); color: #fda4af; }
+        @media (max-width: 700px) { .login-container { min-height: auto; border-radius: 16px; } .login-form { padding: 30px 22px; } }
     </style>
 
+    @include('settings._theme', ['branding' => $branding])
+    <style>.login-cover { width: 100%; max-height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 24px; } .logo { overflow: hidden; }</style>
 </head>
 
-<body>
+<body class="glass-theme">
 
 <div class="login-container">
 
     <div class="login-brand">
+        @if($branding['login_image_path'])<img src="{{ asset('storage/'.$branding['login_image_path']) }}" alt="{{ $branding['system_name'] }}" class="login-cover">@endif
 
         <div class="logo">
-            🖨️
+            @if($branding['logo_path'])<img src="{{ asset('storage/'.$branding['logo_path']) }}" alt="{{ $branding['system_name'] }} logo">@else 🖨️ @endif
         </div>
 
-        <h1>Printing POS</h1>
+        <h1>{{ $branding['system_name'] }}</h1>
 
         <p>
-            A simple and modern point-of-sale
-            management system for printing,
-            photocopy, scanning, and rush ID services.
+            {{ $branding['login_description'] }}
         </p>
 
         <div class="features">
@@ -316,7 +337,7 @@
 
 
         <div class="footer">
-            Printing POS Management System
+            {{ $branding['system_name'] }} {{ $branding['tagline'] }}
         </div>
 
     </div>

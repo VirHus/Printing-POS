@@ -10,12 +10,11 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            return redirect()->route('dashboard');
+            return redirect()->route(Auth::user()->isSuperadmin() ? 'settings.edit' : 'dashboard');
         }
 
         return view('auth.login');
     }
-
 
     public function login(Request $request)
     {
@@ -24,8 +23,7 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-
-        if (!Auth::attempt($credentials)) {
+        if (! Auth::attempt($credentials)) {
 
             return back()
                 ->withErrors([
@@ -36,27 +34,24 @@ class AuthController extends Controller
                 );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Check Account Status
         |--------------------------------------------------------------------------
         */
 
-        if (!auth()->user()->is_active) {
+        if (! auth()->user()->is_active) {
 
             Auth::logout();
 
             return back()
                 ->withErrors([
-                    'email' =>
-                        'Your account has been deactivated. Please contact an administrator.',
+                    'email' => 'Your account has been deactivated. Please contact an administrator.',
                 ])
                 ->withInput(
                     $request->only('email')
                 );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -66,12 +61,16 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        if ($request->user()->isSuperadmin()) {
+            $request->session()->forget('url.intended');
+
+            return redirect()->route('settings.edit');
+        }
 
         return redirect()->intended(
             route('dashboard')
         );
     }
-
 
     public function logout(Request $request)
     {

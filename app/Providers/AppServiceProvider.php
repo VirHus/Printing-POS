@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\SystemSetting;
+use App\Models\User;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\View as ViewInstance;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -11,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->scoped(SystemSetting::class, fn (): SystemSetting => SystemSetting::firstOrNew(['id' => 1]));
     }
 
     /**
@@ -19,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer(['layouts.app', 'auth.login', 'pos.index', 'sales.show', 'settings.edit', 'settings.setup'], function (ViewInstance $view): void {
+            $view->with('branding', SystemSetting::current()->settings());
+            if ($view->name() === 'layouts.app') {
+                $view->with('sidebarItems', SystemSetting::current()->sidebarItems(auth()->user()));
+                $view->with('needsSuperadminSetup', ! User::where('role', 'Superadmin')->exists());
+            }
+        });
     }
 }
