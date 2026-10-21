@@ -20,12 +20,16 @@ class Sale extends Model
         'payment_reference',
         'customer_name',
         'order_notes',
+        'cost_total',
+        'cost_complete',
     ];
 
     protected $casts = [
         'total_amount' => 'decimal:2',
         'cash_received' => 'decimal:2',
         'change_amount' => 'decimal:2',
+        'cost_total' => 'decimal:2',
+        'cost_complete' => 'boolean',
     ];
 
     public function user(): BelongsTo

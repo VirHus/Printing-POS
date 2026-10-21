@@ -729,10 +729,19 @@
                         {{ $item['label'] }}
                     </a>
                 @endforeach
+                @foreach($customPages as $page)
+                    @if($page['section'] !== $currentSection)
+                        <div class="menu-title">{{ $page['section'] }}</div>
+                        @php($currentSection = $page['section'])
+                    @endif
+                    <a href="{{ route('pages.show', $page['slug']) }}" class="{{ request()->routeIs('pages.show') && request()->route('page') === $page['slug'] ? 'active' : '' }}"><span class="menu-icon">+</span>{{ $page['title'] }}</a>
+                @endforeach
             @else
                 <div class="menu-title">Customization</div>
                 <a href="{{ route('settings.edit') }}" class="{{ request()->routeIs('settings.edit') ? 'active' : '' }}">System Settings</a>
                 <a href="{{ route('settings.sidebar.edit') }}" class="{{ request()->routeIs('settings.sidebar.*') ? 'active' : '' }}">Sidebar Editor</a>
+                <a href="{{ route('settings.builder.edit') }}" class="{{ request()->routeIs('settings.builder.*') ? 'active' : '' }}">Appearance & Dashboard</a>
+                <a href="{{ route('settings.pages.index') }}" class="{{ request()->routeIs('settings.pages.*') ? 'active' : '' }}">Custom Pages</a>
                 <a href="{{ route('stores.index') }}" class="{{ request()->routeIs('stores.*') ? 'active' : '' }}">Store Branding</a>
                 <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active' : '' }}">Accounts</a>
             @endif
@@ -747,7 +756,7 @@
 
         <div class="sidebar-footer">
 
-            <div class="user-mini">
+            <a href="{{ route('profile.edit') }}" class="user-mini rounded-lg transition hover:bg-white/5" aria-label="Edit my profile" title="Edit my profile">
 
                 <div class="avatar">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -758,7 +767,7 @@
                     <span>{{ auth()->user()->role }}</span>
                 </div>
 
-            </div>
+            </a>
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -801,7 +810,7 @@
 
             </div>
 
-            <div class="top-user">
+            <a href="{{ route('profile.edit') }}" class="top-user rounded-lg transition hover:bg-white/5" aria-label="Edit my profile" title="Edit my profile">
 
                 <div class="avatar">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
@@ -811,7 +820,7 @@
                     <strong>{{ auth()->user()->name }}</strong>
                 </div>
 
-            </div>
+            </a>
 
         </header>
 

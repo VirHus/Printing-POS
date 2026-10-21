@@ -21,7 +21,7 @@
         </article>
         <article class="rounded-2xl border border-slate-700 glass-surface bg-[#0c1828] p-5">
             <p class="text-sm font-medium text-slate-400">Active services</p>
-            <p class="mt-3 text-3xl font-bold tracking-tight text-teal-300">{{ $products->where('is_active', true)->count() }}</p>
+            <p class="mt-3 text-3xl font-bold tracking-tight text-teal-300">{{ $products->filter(fn ($product) => $product->is_active && $product->category?->is_active)->count() }}</p>
             <p class="mt-2 text-xs text-slate-500">Available at the point of sale</p>
         </article>
         <article class="rounded-2xl border border-slate-700 glass-surface bg-[#0c1828] p-5">
@@ -32,12 +32,13 @@
     </div>
 
     <section class="overflow-hidden rounded-2xl border border-slate-700 glass-surface bg-[#0c1828] shadow-xl shadow-black/10">
-        <div class="flex flex-col gap-5 border-b border-slate-700/70 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div class="flex flex-col gap-5 border-b border-slate-700/70 p-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:p-6">
             <div>
                 <p class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-teal-400">Service catalog</p>
                 <h2 class="text-2xl font-bold tracking-tight text-white">Printing Services</h2>
                 <p class="mt-2 text-sm leading-6 text-slate-400">Manage service prices, categories, and availability.</p>
             </div>
+            <a href="{{ route('categories.index') }}" class="inline-flex items-center justify-center rounded-xl border border-teal-700 px-5 py-3 text-sm font-semibold text-teal-300">Manage categories</a>
             <a href="{{ route('products.create') }}" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-500">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke-width="2" stroke-linecap="round"/></svg>
                 Add Service

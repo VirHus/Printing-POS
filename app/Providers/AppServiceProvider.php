@@ -27,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
             $view->with('branding', SystemSetting::current()->settings());
             if ($view->name() === 'layouts.app') {
                 $view->with('sidebarItems', SystemSetting::current()->sidebarItems(auth()->user()));
+                $view->with('customPages', SystemSetting::current()->customPages(auth()->user()));
                 $view->with('needsSuperadminSetup', ! User::where('role', 'Superadmin')->exists());
             }
         });

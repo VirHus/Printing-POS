@@ -5,6 +5,7 @@
 @section('page-title', 'Sales Reports')
 
 @section('content')
+@if(auth()->user()->role === 'Administrator' && \App\Models\SystemSetting::current()->moduleEnabled('profit', auth()->user()))<a href="{{ route('profit.index', request()->only('store_id', 'from', 'to')) }}" class="mb-5 inline-flex rounded-xl border border-teal-700 px-5 py-3 text-sm text-teal-300">Open profit & expense report →</a>@endif
 
 <div class="card" style="margin-bottom:20px;">
 

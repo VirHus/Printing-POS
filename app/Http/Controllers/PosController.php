@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\InventoryConsumption;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Sale;
@@ -53,9 +54,9 @@ class PosController extends Controller
         $total = 0;
 
         foreach ($validated['items'] as $item) {
-            $product = Product::findOrFail($item['product_id']);
+            $product = Product::with('category')->findOrFail($item['product_id']);
 
-            if (! $product->is_active) {
+            if (! $product->is_active || ! $product->category?->is_active) {
                 return back()->withErrors([
                     'items' => "The service {$product->name} is inactive.",
                 ]);
@@ -110,6 +111,8 @@ class PosController extends Controller
                     'subtotal' => $subtotal,
                 ]);
             }
+
+            app(InventoryConsumption::class)->consume($sale);
 
             return $sale;
         });

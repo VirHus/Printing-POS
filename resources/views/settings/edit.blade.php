@@ -16,7 +16,11 @@
         <div class="flex gap-3"><a href="{{ route('users.index') }}" class="rounded-xl border border-slate-600 px-4 py-3 text-sm text-slate-200 hover:border-teal-500">Manage users</a><a href="{{ route('stores.index') }}" class="rounded-xl border border-slate-600 px-4 py-3 text-sm text-slate-200 hover:border-teal-500">Manage stores</a></div>
     </header>
     <nav aria-label="Settings sections" class="flex flex-wrap gap-2"><a href="#branding" class="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-300">Branding</a><a href="#images" class="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-300">Images</a><a href="#appearance" class="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-300">Appearance</a><a href="#receipts" class="rounded-lg bg-slate-800 px-4 py-2 text-sm text-slate-300">Receipts</a></nav>
-    <a href="{{ route('settings.sidebar.edit') }}" class="inline-flex items-center gap-2 rounded-lg border border-teal-700 px-4 py-3 text-sm font-semibold text-teal-300">Open Sidebar Editor →</a>
+    <div class="flex flex-wrap gap-3">
+        <a href="{{ route('settings.sidebar.edit') }}" class="rounded-lg border border-teal-700 px-4 py-3 text-sm font-semibold text-teal-300">Sidebar Editor</a>
+        <a href="{{ route('settings.builder.edit') }}" class="rounded-lg border border-teal-700 px-4 py-3 text-sm font-semibold text-teal-300">Appearance, Dashboard & Modules</a>
+        <a href="{{ route('settings.pages.index') }}" class="rounded-lg border border-teal-700 px-4 py-3 text-sm font-semibold text-teal-300">Custom Pages</a>
+    </div>
     <form method="POST" action="{{ route('settings.update') }}" enctype="multipart/form-data" class="settings-form space-y-6">
         @csrf @method('PUT')
         <section id="branding" class="rounded-2xl border border-slate-700 glass-surface bg-[#0c1828] p-5 sm:p-7">

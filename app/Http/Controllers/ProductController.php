@@ -24,7 +24,9 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('products.create', compact('categories'));
+        $units = Product::distinct()->orderBy('unit')->pluck('unit');
+
+        return view('products.create', compact('categories', 'units'));
     }
 
     public function store(Request $request)
@@ -46,11 +48,10 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        $categories = Category::where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        $categories = Category::where('is_active', true)->orWhere('id', $product->category_id)->orderBy('name')->get();
+        $units = Product::distinct()->orderBy('unit')->pluck('unit');
 
-        return view('products.edit', compact('product', 'categories'));
+        return view('products.edit', compact('product', 'categories', 'units'));
     }
 
     public function update(Request $request, Product $product)
@@ -82,7 +83,7 @@ class ProductController extends Controller
     public function toggle(Product $product)
     {
         $product->update([
-            'is_active' => !$product->is_active,
+            'is_active' => ! $product->is_active,
         ]);
 
         return redirect()

@@ -38,14 +38,11 @@
                 </div>
                 <div>
                     <label for="serviceUnit">Unit <span class="text-teal-300">*</span></label>
-                    <select id="serviceUnit" name="unit" required aria-invalid="{{ $errors->has('unit') ? 'true' : 'false' }}" @error('unit') aria-describedby="unitError" @enderror>
-                        @foreach(['page' => 'Page', 'piece' => 'Piece', 'set' => 'Set', 'copy' => 'Copy'] as $value => $label)
-                            <option value="{{ $value }}" @selected(old('unit', $product?->unit ?? 'page') === $value)>{{ $label }}</option>
-                        @endforeach
-                        @if($product && !in_array($product->unit, ['page', 'piece', 'set', 'copy']))
-                            <option value="{{ $product->unit }}" @selected(old('unit', $product->unit) === $product->unit)>{{ ucfirst($product->unit) }}</option>
-                        @endif
-                    </select>
+                    <input id="serviceUnit" name="unit" list="serviceUnits" value="{{ old('unit', $product?->unit ?? 'page') }}" maxlength="50" required aria-invalid="{{ $errors->has('unit') ? 'true' : 'false' }}">
+                    <datalist id="serviceUnits">
+                        @foreach($units as $unit)<option value="{{ $unit }}"></option>@endforeach
+                    </datalist>
+                    <p class="mt-2 text-xs text-slate-400">Choose an existing unit or type your own, such as hour or document.</p>
                     @error('unit')<p id="unitError" class="mt-2 text-xs text-rose-300">{{ $message }}</p>@enderror
                 </div>
             </div>
