@@ -761,7 +761,7 @@
                 <div class="avatar">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                 </div>
-
+                
                 <div>
                     <strong>{{ auth()->user()->name }}</strong>
                     <span>{{ auth()->user()->role }}</span>
